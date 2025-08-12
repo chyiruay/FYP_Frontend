@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        google()       // 必须添加，因为 Secrets 插件在 Google 仓库
+        mavenCentral() // Maven 中央仓库
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.2.1"  // Android Gradle 插件（建议版本与项目匹配）
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20"  // Kotlin 插件（如果使用 Kotlin）
+        classpath "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1"  // Secrets 插件
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// 可选：自定义构建目录（谨慎使用）
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+// 按需依赖 :app 模块（如果存在）
+subprojects {
+    if (project.name != "app" && project.hasProperty("android")) {
+        project.evaluationDependsOn(":app")
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
