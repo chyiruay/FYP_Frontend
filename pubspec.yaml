@@ -28,17 +28,12 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  intl: ^0.20.2
   flutter:
     sdk: flutter
-  http: ^1.4.0  # 用于调用 Django API
-  provider: ^6.0.5  # 状态管理（可选）
+  http: ^1.4.0  # calls the Django API
   shared_preferences: ^2.3.2
   google_maps_flutter: ^2.6.1
-  geolocator: ^11.0.0
   location: ^5.0.3
-  flutter_map: ^6.1.0
-  latlong2: ^0.9.0
   url_launcher: ^6.2.5
 
   # The following adds the Cupertino Icons font to your application.

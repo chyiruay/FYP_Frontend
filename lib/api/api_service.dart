@@ -4,16 +4,19 @@ import '../models/user.dart';
 import '../models/donation.dart';
 import '../models/water_level.dart';
 import '../models/shelter.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api_exception.dart';
 
 class ApiService {
-  //static const String baseUrl = "http://10.0.2.2:8000"; //模拟器
-  static const String baseUrl = "http://192.168.0.9:8000";
-  //static const String baseUrl = "http://10.170.202.245:8000";
+  // Set at build time so the source doesn't change per network:
+  //   flutter run --dart-define=API_BASE_URL=http://<backend-host>:8000
+  // Android emulator: http://10.0.2.2:8000 (the host machine).
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://192.168.0.9:8000',
+  );
 
-
-  /// 注册用户
+  /// Register a new user.
   static Future<bool> registerUser(String username, String email,
       String password, String gender) async {
     final response = await http.post(
@@ -34,7 +37,7 @@ class ApiService {
     }
   }
 
-  ///登录
+  /// Log in and cache the token and profile in SharedPreferences.
   static Future<bool> login(String username, String password) async {
     final url = Uri.parse('$baseUrl/api/login/');
 
@@ -49,7 +52,6 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      // 可以在这里处理 token 或用户数据，例如保存 token
       String token = data['token'];
 
       final prefs = await SharedPreferences.getInstance();
@@ -121,7 +123,7 @@ class ApiService {
   }
 
 
-  /// 获取用户列表
+  /// Fetch all users (admin only).
   static Future<List<User>> fetchUsers() async {
     final response = await http.get(Uri.parse('$baseUrl/api/users/'));
 
@@ -129,11 +131,11 @@ class ApiService {
       List<dynamic> jsonData = json.decode(response.body);
       return jsonData.map((e) => User.fromJson(e)).toList();
     } else {
-      throw Exception("Fail to get user data");
+      throw ApiException("Failed to load users", statusCode: response.statusCode);
     }
   }
 
-  /// 获取捐赠信息
+  /// Fetch donation items.
   static Future<List<Donation>> fetchDonations() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
@@ -142,7 +144,7 @@ class ApiService {
       Uri.parse('$baseUrl/api/donations/'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Token $token', // 添加认证 token
+        'Authorization': 'Token $token',
       },
     );
 
@@ -150,7 +152,7 @@ class ApiService {
       List<dynamic> jsonData = json.decode(response.body);
       return jsonData.map((e) => Donation.fromJson(e)).toList();
     } else {
-      throw Exception("Fail to get donation data: ${response.statusCode}");
+      throw ApiException("Failed to load donations", statusCode: response.statusCode);
     }
   }
 
@@ -196,7 +198,7 @@ class ApiService {
 
     if (token == null) {
       print('No auth token found - user not logged in');
-      throw Exception('Please log in to view water level data');
+      throw const ApiException('Please log in to view water level data');
     }
 
     final response = await http.get(
@@ -212,11 +214,11 @@ class ApiService {
       return data.map((e) => WaterLevel.fromJson(e)).toList();
     } else if (response.statusCode == 401) {
       print('Authentication failed - token may be invalid');
-      throw Exception('Authentication failed. Please log in again.');
+      throw ApiException('Authentication failed. Please log in again.', statusCode: response.statusCode);
     } else {
       print('Failed to load water level data: ${response.statusCode}');
       print('Response body: ${response.body}');
-      throw Exception('Failed to load water level data');
+      throw ApiException('Failed to load water level data', statusCode: response.statusCode);
     }
   }
 
@@ -226,7 +228,7 @@ class ApiService {
 
     if (token == null) {
       print('No auth token found - user not logged in');
-      throw Exception('Please log in to view water level data');
+      throw const ApiException('Please log in to view water level data');
     }
 
     final response = await http.get(
@@ -242,11 +244,11 @@ class ApiService {
       return {for (var s in data) s['code']: s['name']};
     } else if (response.statusCode == 401) {
       print('Authentication failed - token may be invalid');
-      throw Exception('Authentication failed. Please log in again.');
+      throw ApiException('Authentication failed. Please log in again.', statusCode: response.statusCode);
     } else {
       print('Failed to load state list: ${response.statusCode}');
       print('Response body: ${response.body}');
-      throw Exception('Failed to load state list');
+      throw ApiException('Failed to load state list', statusCode: response.statusCode);
     }
   }
 
@@ -255,8 +257,7 @@ class ApiService {
     final token = prefs.getString('auth_token');
 
     if (token == null) {
-      print('No auth token found');
-      return [];
+      throw const ApiException('Please log in to view your donation history');
     }
 
     final response = await http.get(
@@ -270,8 +271,8 @@ class ApiService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      print('Failed to load donation history: ${response.statusCode}');
-      return [];
+      throw ApiException('Failed to load donation history',
+          statusCode: response.statusCode);
     }
   }
 
@@ -283,7 +284,7 @@ class ApiService {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => Shelter.fromJson(item)).toList();
     } else {
-      throw Exception('Failed to load shelters');
+      throw ApiException('Failed to load shelters', statusCode: response.statusCode);
     }
   }
 }
