@@ -192,29 +192,17 @@ class ApiService {
     }
   }
 
+  /// Public endpoint: no token is sent, so it works logged out. (Sending an
+  /// invalid or stale token would make the backend reject it with 401.)
   static Future<List<WaterLevel>> fetchWaterLevels(String stateCode) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
-
-    if (token == null) {
-      print('No auth token found - user not logged in');
-      throw const ApiException('Please log in to view water level data');
-    }
-
     final response = await http.get(
       Uri.parse('$baseUrl/api/water-level/?state=$stateCode'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Token $token',
-      },
+      headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((e) => WaterLevel.fromJson(e)).toList();
-    } else if (response.statusCode == 401) {
-      print('Authentication failed - token may be invalid');
-      throw ApiException('Authentication failed. Please log in again.', statusCode: response.statusCode);
     } else {
       print('Failed to load water level data: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -222,29 +210,16 @@ class ApiService {
     }
   }
 
+  /// Public endpoint, no token sent (see [fetchWaterLevels]).
   static Future<Map<String, String>> fetchStateMap() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
-
-    if (token == null) {
-      print('No auth token found - user not logged in');
-      throw const ApiException('Please log in to view water level data');
-    }
-
     final response = await http.get(
       Uri.parse('$baseUrl/api/states/'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Token $token',
-      },
+      headers: {'Content-Type': 'application/json'},
     );
-    
+
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return {for (var s in data) s['code']: s['name']};
-    } else if (response.statusCode == 401) {
-      print('Authentication failed - token may be invalid');
-      throw ApiException('Authentication failed. Please log in again.', statusCode: response.statusCode);
     } else {
       print('Failed to load state list: ${response.statusCode}');
       print('Response body: ${response.body}');
