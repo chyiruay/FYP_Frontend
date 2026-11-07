@@ -7,10 +7,9 @@ relief.
 This is the mobile client. The backend (Django REST API + staff web dashboard) lives in
 [FYP_Backend](https://github.com/chyiruay/FYP_Backend).
 
-<!-- Add screenshots to docs/screenshots/ and they will show here -->
 | Forecast | Water level | Shelter map | Donation |
 |---|---|---|---|
-| ![Forecast](docs/screenshots/forecast.png) | ![Water level](docs/screenshots/water_level.png) | ![Map](docs/screenshots/map.png) | ![Donation](docs/screenshots/donation.png) |
+| ![Forecast](docs/screenshots/forecast.jpeg) | ![Water level](docs/screenshots/water_level.jpeg) | ![Map](docs/screenshots/map.jpeg) | ![Donation](docs/screenshots/donation.jpeg) |
 
 ## Features
 
