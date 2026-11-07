@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../api/api_service.dart';
+import '../api/api_exception.dart';
 
 class DonateHistoryPage extends StatefulWidget {
   const DonateHistoryPage({super.key});
@@ -11,13 +12,46 @@ class DonateHistoryPage extends StatefulWidget {
 class _DonateHistoryPageState extends State<DonateHistoryPage> {
   List<dynamic> _donationHistory = [];
   bool _isLoading = true;
+  String? _error;
 
   Future<void> loadHistory() async {
-    final history = await ApiService.fetchDonationHistory();
     setState(() {
-      _donationHistory = history;
-      _isLoading = false;
+      _isLoading = true;
+      _error = null;
     });
+    try {
+      final history = await ApiService.fetchDonationHistory();
+      if (!mounted) return;
+      setState(() {
+        _donationHistory = history;
+        _isLoading = false;
+      });
+    } catch (e) {
+      // ApiException for HTTP errors, or a network error (e.g. backend offline)
+      if (!mounted) return;
+      setState(() {
+        _error = e is ApiException ? e.message : 'Could not reach the server';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+            const SizedBox(height: 16),
+            Text(_error!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: loadHistory, child: const Text('Retry')),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -238,7 +272,9 @@ class _DonateHistoryPageState extends State<DonateHistoryPage> {
                       valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
                     ),
                   )
-                : _donationHistory.isEmpty
+                : _error != null
+                    ? _buildErrorState()
+                    : _donationHistory.isEmpty
                     ? _buildEmptyState()
                     : Container(
                         padding: const EdgeInsets.all(20),
