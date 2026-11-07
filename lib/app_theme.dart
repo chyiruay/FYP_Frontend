@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 final ThemeData appTheme = ThemeData(
   brightness: Brightness.light,
-  primaryColor: const Color(0xFF007BFF), // 主色蓝
+  primaryColor: const Color(0xFF007BFF), // primary blue
   colorScheme: ColorScheme.fromSeed(
     seedColor: const Color(0xFF007BFF),
     primary: const Color(0xFF007BFF),
-    secondary: const Color(0xFFFFA500), // 副色橙
+    secondary: const Color(0xFFFFA500), // secondary orange
     onPrimary: Colors.white,
     onSecondary: Colors.white,
   ),
@@ -40,7 +40,7 @@ final ThemeData appTheme = ThemeData(
   ),
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
     backgroundColor: Colors.white,
-    selectedItemColor: Color(0xFFFFA500), // 橙色激活
+    selectedItemColor: Color(0xFFFFA500), // orange when active
     unselectedItemColor: Colors.grey,
     selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
     showUnselectedLabels: true,

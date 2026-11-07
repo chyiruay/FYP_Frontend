@@ -46,7 +46,7 @@ class _DonationFormPageState extends State<DonationFormPage> {
         date: DateTime.now(),
       );
 
-      // 保存到本地历史记录
+      // Save to local history
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? existingData = prefs.getString('donation_history');
       List<Map<String, dynamic>> recordList = [];
@@ -58,7 +58,7 @@ class _DonationFormPageState extends State<DonationFormPage> {
       recordList.add(newRecord.toJson());
       await prefs.setString('donation_history', json.encode(recordList));
 
-      // 提交到后端
+      // Submit to the backend
       final success = await ApiService.submitDonationRecord(
         donationId: widget.donation.id!,
         quantity: quantity!,

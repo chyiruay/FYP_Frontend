@@ -4,7 +4,7 @@ import 'package:location/location.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/api_service.dart';
 import '../models/shelter.dart';
-import 'dart:math';
+import '../utils/distance.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -66,23 +66,9 @@ class _MapPageState extends State<MapPage> {
   Shelter? _findNearestShelter(LatLng userLatLng) {
     final availableShelters = _shelters.where((shelter) => shelter.available).toList();
     if (availableShelters.isEmpty) return null;
-    availableShelters.sort((a, b) => _distance(userLatLng, a.location).compareTo(_distance(userLatLng, b.location)));
+    availableShelters.sort((a, b) => distanceInMetres(userLatLng, a.location)
+        .compareTo(distanceInMetres(userLatLng, b.location)));
     return availableShelters.first;
-  }
-
-  double _distance(LatLng a, LatLng b) {
-    // Haversine formula for distance between two lat/lng points
-    const double R = 6371e3; // metres
-    final double lat1 = a.latitude * 3.141592653589793 / 180;
-    final double lat2 = b.latitude * 3.141592653589793 / 180;
-    final double dLat = (b.latitude - a.latitude) * 3.141592653589793 / 180;
-    final double dLng = (b.longitude - a.longitude) * 3.141592653589793 / 180;
-    final double aa =
-      (sin(dLat/2) * sin(dLat/2)) +
-      cos(lat1) * cos(lat2) *
-      (sin(dLng/2) * sin(dLng/2));
-    final double c = 2 * atan2(sqrt(aa), sqrt(1-aa));
-    return R * c;
   }
 
   Future<void> _startNavigation() async {
@@ -393,7 +379,7 @@ class _MapPageState extends State<MapPage> {
             myLocationEnabled: true,
             onMapCreated: (controller) => _controller = controller,
             markers: {
-              // 用户位置
+              // User location
               Marker(
                 markerId: const MarkerId('user'),
                 position: userLatLng,
@@ -401,7 +387,7 @@ class _MapPageState extends State<MapPage> {
                 infoWindow: const InfoWindow(title: 'You are here'),
               ),
 
-              // 避难所标记
+              // Shelter markers
               ..._shelters.map((shelter) {
                 final isAvailable = shelter.available;
                 return Marker(
@@ -426,7 +412,7 @@ class _MapPageState extends State<MapPage> {
               }),
             },
 
-            // 画线（导航路线）
+            // Route line to the selected shelter
             polylines: _selectedShelter == null
                 ? {}
                 : {

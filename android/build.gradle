@@ -1,11 +1,11 @@
 buildscript {
     repositories {
-        google()       // 必须添加，因为 Secrets 插件在 Google 仓库
-        mavenCentral() // Maven 中央仓库
+        google()
+        mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:8.13.0"  // Android Gradle 插件（建议版本与项目匹配）
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20"  // Kotlin 插件（如果使用 Kotlin）
+        classpath "com.android.tools.build:gradle:8.13.0"  // Android Gradle Plugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20"  // Kotlin Gradle Plugin
     }
 }
 
@@ -16,7 +16,7 @@ allprojects {
     }
 }
 
-// 可选：自定义构建目录（谨慎使用）
+// Put build output in the Flutter project's build/ folder
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
@@ -36,7 +36,7 @@ subprojects {
     }
 }
 
-// 按需依赖 :app 模块（如果存在）
+// Evaluate :app before plugin subprojects
 subprojects {
     if (project.name != "app" && project.hasProperty("android")) {
         project.evaluationDependsOn(":app")

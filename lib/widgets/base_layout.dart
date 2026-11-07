@@ -42,7 +42,7 @@ class BaseLayout extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/register').then((result) {
                       if (result == true && onLoginStatusChanged != null) {
-                        onLoginStatusChanged!(); // 调用传入的函数
+                        onLoginStatusChanged!(); // notify the parent
                       }
                     });
                   }
@@ -53,7 +53,7 @@ class BaseLayout extends StatelessWidget {
       bottomNavigationBar: showBottomNav
           ? Container(
         decoration: const BoxDecoration(
-          color: Colors.white, // 可改为主题色
+          color: Colors.white, // could use the theme color
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),

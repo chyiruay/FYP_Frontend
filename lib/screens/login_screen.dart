@@ -38,10 +38,10 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setBool('isLoggedIn', true);
 
         Future.delayed(const Duration(seconds: 1), () {
-          Navigator.pop(context, true); //  登录成功
+          Navigator.pop(context, true); // login succeeded
         });
 
-        // 登录成功，跳转到主页面
+        // Login succeeded, go to the main screen
         Future.delayed(const Duration(seconds: 1), () {
           Navigator.pushAndRemoveUntil(
             context,
