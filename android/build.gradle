@@ -4,9 +4,8 @@ buildscript {
         mavenCentral() // Maven 中央仓库
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:8.2.1"  // Android Gradle 插件（建议版本与项目匹配）
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20"  // Kotlin 插件（如果使用 Kotlin）
-        classpath "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1"  // Secrets 插件
+        classpath "com.android.tools.build:gradle:8.13.0"  // Android Gradle 插件（建议版本与项目匹配）
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20"  // Kotlin 插件（如果使用 Kotlin）
     }
 }
 
@@ -21,6 +20,20 @@ allprojects {
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+// Old plugins (e.g. location 5.x pins compileSdk 33) fail AAR metadata checks
+// against current AndroidX, which needs 34+. Raise them to the app's compileSdk.
+// Must be registered before the evaluationDependsOn block below.
+subprojects {
+    afterEvaluate { p ->
+        if (p.plugins.hasPlugin("com.android.library")) {
+            def sdk = p.android.compileSdk
+            if (sdk == null || sdk < 36) {
+                p.android.compileSdk = 36
+            }
+        }
+    }
 }
 
 // 按需依赖 :app 模块（如果存在）

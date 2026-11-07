@@ -11,3 +11,6 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Maps API key (read by secrets-gradle-plugin)
+secrets.properties

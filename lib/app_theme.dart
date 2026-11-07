@@ -45,7 +45,7 @@ final ThemeData appTheme = ThemeData(
     selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
     showUnselectedLabels: true,
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     elevation: 2,
     margin: const EdgeInsets.all(8),

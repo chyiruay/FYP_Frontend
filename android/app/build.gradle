@@ -3,12 +3,18 @@ plugins {
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.android.libraries.mapsplatform.secrets-gradle-plugin"
+}
+
+// Google Maps key: read from android/secrets.properties (gitignored), falling
+// back to android/local.defaults.properties (committed placeholder).
+def mapsSecrets = new Properties()
+[rootProject.file("local.defaults.properties"), rootProject.file("secrets.properties")].each { f ->
+    if (f.exists()) { f.withInputStream { mapsSecrets.load(it) } }
 }
 
 android {
     namespace = "com.example.water_alert_app"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -24,10 +30,11 @@ android {
         applicationId = "com.example.water_alert_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders += [MAPS_API_KEY:mapsSecrets.getProperty("MAPS_API_KEY", "DEFAULT_API_KEY")]
     }
 
     buildTypes {

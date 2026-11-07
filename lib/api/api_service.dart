@@ -9,8 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   //static const String baseUrl = "http://10.0.2.2:8000"; //模拟器
-  //static const String baseUrl = "http://192.168.59.89:8000";
-  static const String baseUrl = "http://10.170.202.245:8000";
+  static const String baseUrl = "http://192.168.0.9:8000";
+  //static const String baseUrl = "http://10.170.202.245:8000";
 
 
   /// 注册用户
